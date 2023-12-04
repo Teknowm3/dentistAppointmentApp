@@ -1,4 +1,7 @@
-# Version 0.14.1
+# Version 0.14.3
+# Yapılacaklar 
+# Tarih 2023:10:10 cinsinden veya 20231010 şeklinde girilebilir olacak
+# Zaman kısmında 10:3 şeklinde girilirse bir bug oluyor onu düzelt.
 
 import tkinter as tk
 from tkinter import messagebox
@@ -99,7 +102,6 @@ class DentistAppointmentSystemUI:
         self.type_menu.grid(row=3, column=1, padx=10, pady=10)
         
         #   Button'ların yerleştirmeleri
-        
         #     Randevu al'ın 
         self.schedule_button.grid(row=4, column=0,  columnspan=2, padx=10, pady=10)
         #     Randevu'yu Sil'in   
@@ -114,16 +116,27 @@ class DentistAppointmentSystemUI:
         time = self.time_entry.get()
         appointment_type = self.type_var.get()
 
+        #   Hasta Adı Kısmı İsimsiz Kalırsa Hata Ver.
+        if not patient_name:
+            messagebox.showerror("Hata\n", "Lütfen geçerli bir hasta adı girin.")
+            return
+        
         try:
-            #   Tarih ve saat girişlerini doğru formatta mı olduğunu kontrol et.
+            #   Tarih Ve Saat Girişlerini Doğru Formatta mı Olduğunu Kontrol Et.
             appointment_datetime = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
             #   ValueError Çıktısını değiştiriyoz. 
         except ValueError:
-            #   Hata Pencersesinde Tarih veya zamanın hatalı olduğuna dair bir hata mesajı yolla. 
-            messagebox.showerror("Hata", "Lütfen geçerli bir tarih ve saat girin (örneğin, '2023-11-26 14:30').")
-            return
+            try:
+                #   Tarih Ve Saat Girişlerini Doğru Formatta mı Olduğunu Kontrol Et.
+                appointment_datetime = datetime.strptime(f"{date} {time}", "%Y%m%d %H:%M")
+            except ValueError:
+                
+                
+                #   Hata Pencersesinde Tarih Veya Zamanın Hatalı Olduğuna Dair Bir Hata Mesajı Yolla. 
+                messagebox.showerror("Hata", "Lütfen geçerli bir tarih ve saat girin (örneğin, '2023-11-26 14:30').")
+                return
 
-        #   Randevu almak için gerekli kontrolleri yap
+        #   Randevu Almak İçin Gerekli Kontrolleri Yap
         #   Default Seçimdeyse Hata Ver.
         if appointment_type == "Lütfen Seçim Yapınız":
             messagebox.showerror("Hata", "Lütfen geçerli bir randevu türü seçin.")
