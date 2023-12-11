@@ -1,4 +1,4 @@
-# Version 0.2
+# Version 0.2.1
 # Yapılacaklar 
 # Diş Hekimleri yarat onlara göre randevular alınsın.  X -- >   !!-- Oncelikli --!!
 # Zaman kisminda 10:3 seklinde girilirse bir bug oluyor onu duzelt.  X -- > Oncelikli
