@@ -1,10 +1,12 @@
-# Version 0.2
+# Version 0.2.2
 # Yapılacaklar 
 # Diş Hekimleri yarat onlara göre randevular alınsın.  X -- >   !!-- Oncelikli --!!
-# Zaman kisminda 10:3 seklinde girilirse bir bug oluyor onu duzelt.  X -- > Oncelikli
+# Zaman kisminda 10:3 seklinde girilirse bir bug oluyor onu duzelt.  ++ -- > Oncelikli
+# !! Yeni Bug Zaman İle Tarih Kısmını Teker Teker Kontrol Etmen Lazım X 
 
 # Yapılanlar
-# 10 dakika aralıklı alınan saat aralığını çıkartmışım geri ekledim.
+# 1. önceki sürümde sort mekanizması geri eklendi.
+# Zaman kisminda 10:3 seklinde girilirse bir bug çözüldü.
 
 import tkinter as tk
 from tkinter import messagebox
@@ -122,6 +124,7 @@ class DentistAppointmentSystem:
         #   Randevuları tarih ve saate göre sırala
         sorted_appointments = sorted(appointments_list, key=lambda x: datetime.strptime(f"{x['date']} {x['time']}", "%Y-%m-%d %H:%M"))
         return sorted_appointments
+    
 class DentistAppointmentSystemUI:
     def __init__(self, root):
         self.root = root
@@ -181,6 +184,27 @@ class DentistAppointmentSystemUI:
         except ValueError:
             messagebox.showerror("Hata", "Lütfen geçerli bir tarih ve saat girin (örneğin, '2023-11-26 14:30').")
             return
+        
+        try:
+            # Saat girişi kontrolü
+            time_format = "%H:%M"
+
+            # Saati kontrol et ve düzelt
+            if ":" not in time or len(time.split(":")) != 2:
+                raise ValueError("Geçersiz saat formatı. Saati HH:MM biçiminde girin.")
+    
+            # Saati ayrıştır
+            hour, minute = map(int, time.split(":"))
+
+            # Saati düzelt ve iki haneli sayı formatına getir
+            time = f"{hour:02d}:{minute:02d}"
+
+            # Saati datetime nesnesine çevir
+            appointment_datetime = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+
+        except ValueError:
+            #   Buranın hata kısmı yukarıda kontrol ediliyor.
+            return
 
         if not self.dentist_system.is_valid_appointment_time(time):
             messagebox.showerror("Hata", "Belirtilen saat aralığında randevu alınamaz!")
@@ -214,3 +238,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = DentistAppointmentSystemUI(root)
     root.mainloop()
+ 
