@@ -1,16 +1,14 @@
 # Version 0.2
 # Yapılacaklar 
 # Diş Hekimleri yarat onlara göre randevular alınsın.  X -- >   !!-- Oncelikli --!!
-# Tarih 2023:10:10 cinsinden veya 20231010 seklinde girilebilir olacak.  Bu fikirden vazgeçtim.
 # Zaman kisminda 10:3 seklinde girilirse bir bug oluyor onu duzelt.  X -- > Oncelikli
 
 # Yapılanlar
-# Liste yapısından Linked List yapısına geçiş yapıldı.
-# İsim boş bırakılması durumu göze alındı. --> Alıancak hata değişti.
+# 10 dakika aralıklı alınan saat aralığını çıkartmışım geri ekledim.
 
 import tkinter as tk
 from tkinter import messagebox
-from datetime import datetime
+from datetime import datetime , timedelta
 
 class Node:
     def __init__(self, data):
@@ -54,10 +52,36 @@ class DentistAppointmentSystem:
     #   Randevu Ekleme 
     def schedule_appointment(self, patient_name, date, time, appointment_type):
         if not self.is_valid_appointment_time(time):
-            return False    
-        
+            return False
+
+        new_appointment_time = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")  # new_appointment_time tanımlandı
+
+        # Alınan Randevu Saati 10 dk öncesi ve 10 dk sonrasını alınamaz yapar.
+        current_node = self.appointments.head
+        while current_node:
+            existing_appointment = current_node.data
+            existing_appointment_time = datetime.strptime(f"{existing_appointment['date']} {existing_appointment['time']}", "%Y-%m-%d %H:%M")
+
+            if new_appointment_time > existing_appointment_time - timedelta(minutes=10) and new_appointment_time < existing_appointment_time + timedelta(minutes=10):
+                return False  # Saat çakışıyor
+
+            current_node = current_node.next
+
+        # Başka bir randevu izni kontrolü
+        other_appointment_time = datetime.now() + timedelta(minutes=10)  # Randevu bitiş tarihinden 10 dakika sonrasına yeni randevu alınabilir
+        current_node = self.appointments.head
+        while current_node:
+            existing_appointment = current_node.data
+            existing_appointment_time = datetime.strptime(f"{existing_appointment['date']} {existing_appointment['time']}", "%Y-%m-%d %H:%M")
+
+            if existing_appointment_time > datetime.now() and existing_appointment_time <= other_appointment_time:
+                return False  # Randevu bitiş tarihinden 10 dakika sonrasına başka bir randevu izni var, bu randevu alınamaz
+
+            current_node = current_node.next
+
+        # Yeni Randevu Oluştur.
         new_data = {'patient_name': patient_name, 'date': date, 'time': time, 'type': appointment_type}
-        
+
         if not self.appointments.head:
             self.appointments.head = Node(new_data)
         else:
@@ -67,6 +91,7 @@ class DentistAppointmentSystem:
             current_node.next = Node(new_data)
 
         return True
+
 
     #   Randevu Silme
     def cancel_appointment(self, date, time):
@@ -93,9 +118,10 @@ class DentistAppointmentSystem:
         while current_node:
             appointments_list.append(current_node.data)
             current_node = current_node.next
-
-        return appointments_list
-
+            
+        #   Randevuları tarih ve saate göre sırala
+        sorted_appointments = sorted(appointments_list, key=lambda x: datetime.strptime(f"{x['date']} {x['time']}", "%Y-%m-%d %H:%M"))
+        return sorted_appointments
 class DentistAppointmentSystemUI:
     def __init__(self, root):
         self.root = root
