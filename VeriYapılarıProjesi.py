@@ -8,6 +8,8 @@
 # 1. önceki sürümde sort mekanizması geri eklendi.
 # Zaman kisminda 10:3 seklinde girilirse bir bug çözüldü.
 
+# Göndermeyle alakalı bir sorun yaşıyorum ama dur bakalım
+
 import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime , timedelta
