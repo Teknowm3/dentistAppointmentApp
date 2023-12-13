@@ -1,14 +1,7 @@
-# Version 0.2.2
+# Version 0.2.3
 # Yapılacaklar 
 # Diş Hekimleri yarat onlara göre randevular alınsın.  X -- >   !!-- Oncelikli --!!
-# Zaman kisminda 10:3 seklinde girilirse bir bug oluyor onu duzelt.  ++ -- > Oncelikli
-# !! Yeni Bug Zaman İle Tarih Kısmını Teker Teker Kontrol Etmen Lazım X 
-
-# Yapılanlar
-# 1. önceki sürümde sort mekanizması geri eklendi.
-# Zaman kisminda 10:3 seklinde girilirse bir bug çözüldü.
-
-# Göndermeyle alakalı bir sorun yaşıyorum ama dur bakalım
+# !! Yeni Bug Zaman İle Tarih Kısmını Teker Teker Kontrol Etmen Lazım -- > Bakılma Sıralaması Değiştirildi Sorun Çözüldü
 
 import tkinter as tk
 from tkinter import messagebox
@@ -182,12 +175,6 @@ class DentistAppointmentSystemUI:
             return
 
         try:
-            appointment_datetime = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
-        except ValueError:
-            messagebox.showerror("Hata", "Lütfen geçerli bir tarih ve saat girin (örneğin, '2023-11-26 14:30').")
-            return
-        
-        try:
             # Saat girişi kontrolü
             time_format = "%H:%M"
 
@@ -201,11 +188,13 @@ class DentistAppointmentSystemUI:
             # Saati düzelt ve iki haneli sayı formatına getir
             time = f"{hour:02d}:{minute:02d}"
 
-            # Saati datetime nesnesine çevir
-            appointment_datetime = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
-
         except ValueError:
-            #   Buranın hata kısmı yukarıda kontrol ediliyor.
+            return
+        
+        try:
+            appointment_datetime = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+        except ValueError:
+            messagebox.showerror("Hata", "Lütfen geçerli bir tarih ve saat girin (örneğin, '2023-11-26 14:30').")
             return
 
         if not self.dentist_system.is_valid_appointment_time(time):
