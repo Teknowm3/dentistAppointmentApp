@@ -1,7 +1,6 @@
-# Version 0.2.3
+# Version 0.2.4
 # Yapılacaklar 
 # Diş Hekimleri yarat onlara göre randevular alınsın.  X -- >   !!-- Oncelikli --!!
-# !! Yeni Bug Zaman İle Tarih Kısmını Teker Teker Kontrol Etmen Lazım -- > Bakılma Sıralaması Değiştirildi Sorun Çözüldü
 
 import tkinter as tk
 from tkinter import messagebox
