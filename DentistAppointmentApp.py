@@ -294,21 +294,43 @@ class DentistAppointmentSystemUI:
         appointment_type = self.type_var.get()
         doctor_name = self.doctor_var.get()
 
-        # Hasta adi bos birakilirsa 
+        # Hasta adi bos birakilirsa hata ver
         if not patient_name:
             messagebox.showerror(
                 "Hata",
                 "Hasta adi bos birakilamaz! \nLutfen gecerli bir hasta adi girin.",
             )
             return
-        elif not patient_name.isalpha():
+        # Hasta adi sadece harf, bosluk ve - icermelidir haricinde hata ver
+        elif not all(char.isalpha() or char.isspace() or char == '-' for char in patient_name):
             messagebox.showerror(
                 "Hata",
-                "Hasta adi sadece icermelidir! \nLutfen gecerli bir hasta adi girin.",
+                "Hasta adi sadece harf ve bosluk karakteri iceriyor olmalidir! \nLutfen gecerli bir hasta adi girin.",
             )
             return
         
-        # Hasta adi 100 karakterden fazla olursa
+        # İlk kelimenin basinda veya sonuncu kelimenin sonunda bosluk kontrolu yapılır varsa hata ver
+        if patient_name.startswith(" ") or patient_name.endswith(" "):
+            messagebox.showerror(
+                "Hata",
+                "Hasta adinin basinda veya sonunda bosluk olamaz! \nLutfen gecerli bir hasta adi girin.",
+            )
+            return
+        
+        # Bosluklari kaldirir
+        words = patient_name.split() 
+        # Kelimelerin arasina bosluk koyar
+        patient_name = ' '.join(words)
+        
+        # Eger kelimelerden biri 2 karakterden daha kısa olursa hata ver
+        if any(len(word) < 2 for word in words):
+            messagebox.showerror(
+                "Hata",
+                "Hasta adi 2 karakterden kisa olamaz! \nLutfen gecerli bir hasta adi girin.",
+            )
+            return
+        
+        # Hasta adi 100 karakterden fazla olursa hata ver
         if len(patient_name) > 100:
             messagebox.showerror(
                 "Hata",
@@ -316,17 +338,17 @@ class DentistAppointmentSystemUI:
             )
             return
 
-        # Doktor secimi yapilmadiysa
+        # Doktor secimi yapilmadiysa hata ver
         if doctor_name == "Lutfen Secim Yapiniz":
             messagebox.showerror("Hata", "Lutfen bir doktor secin!")
             return
 
-        # Saat eksik girilirse / hatali girilirse
+        # Saat eksik girilirse / hatali girilirse hata ver
         try:    # 10    :   30
             time_format = "%H:%M"
             if ":" not in time or len(time.split(":")) != 2:
                 raise ValueError("Gecersiz saat formati! \nSaati HH:MM biciminde girin.")
-            # 10     30    şeklinde int olarak bol ve zamana eşitle
+            # 10  30    seklinde int olarak bol ve zamana esitle
             hour, minute = map(int, time.split(":"))
             time = f"{hour:02d}:{minute:02d}"
 
@@ -335,7 +357,7 @@ class DentistAppointmentSystemUI:
             messagebox.showerror("Hata", str(e))
             return
 
-        # Tarih eksik girilirse / hatali girilirse
+        # Tarih eksik girilirse / hatali girilirse hata ver
         try:
             appointment_datetime = datetime.strptime(
                 f"{date} {time}", "%Y-%m-%d %H:%M"
@@ -347,7 +369,7 @@ class DentistAppointmentSystemUI:
             )
             return
         
-        # Randevu alinabilir saatlerin disinda bir zaman girilirse
+        # Randevu alinabilir saatlerin disinda bir zaman girilirse hata ver
         if not self.doctor_system.is_valid_appointment_time(time):
             messagebox.showerror(
                 "Hata", "Belirtilen saat araliginda randevu alinamaz!"
@@ -363,7 +385,7 @@ class DentistAppointmentSystemUI:
             ):
             messagebox.showerror(
                 "Hata",
-                "Gecmiş bir saat icin randevu alinamaz! \nLutfen ileri bir tarih ve saat girin.",
+                "Gecmis bir saat icin randevu alinamaz! \nLutfen ileri bir tarih ve saat girin.",
                 )
             return
         
@@ -376,7 +398,7 @@ class DentistAppointmentSystemUI:
             )
             return
 
-        # Randevu tipi secilmediyse
+        # Randevu tipi secilmediyse hata ver
         if appointment_type == "Lutfen Secim Yapiniz":
             messagebox.showerror(
                 "Hata", "Lutfen gecerli bir randevu turu secin!"
@@ -425,6 +447,6 @@ class DentistAppointmentSystemUI:
             messagebox.showinfo("Randevu Listesi", appointment_str)
 
 if __name__ == "__main__":
-    root = tk.Tk()                          # Tkinter penceresi oluşturur
+    root = tk.Tk()                          # Tkinter penceresi olusturur
     app = DentistAppointmentSystemUI(root)  # GUI'nin olusturulmasi ve Tkinter'a erisimi saglar
     root.mainloop()                         # Pencere kapatilana kadar calismasini saglar
