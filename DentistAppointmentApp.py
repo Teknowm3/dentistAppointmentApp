@@ -59,7 +59,7 @@ class DentistAppointmentSystem:
         self.doctors = [
             Doctor("Lutfen Doktor Seciniz", []),
             Doctor("Dr. Ayse", ["Dis Muayene", "Temel Dis Bakimi", "Dolgu Muayenesi"]),
-            Doctor("Doc.Dr.İlos", ["Cocuk Dis Hekimligi","Temel Dis Bakimi"]),
+            Doctor("Doc.Dr.İlayda", ["Cocuk Dis Hekimligi","Temel Dis Bakimi"]),
             Doctor("Dr. Mehmet", ["Dis cekimi", "Kanal Tedavisi", "Dis Protezi"]),
             Doctor("Prof.Dr.Seyfullah", ["Dis Beyazlatma","Protetik Dis Tedavisi","Restoratif Dis Tedavisi","Genel Dis Hekimligi"])
         ]
@@ -343,19 +343,6 @@ class DentistAppointmentSystemUI:
             messagebox.showerror("Hata", "Lutfen bir doktor secin!")
             return
 
-        # Saat eksik girilirse / hatali girilirse hata ver
-        try:    # 10    :   30
-            time_format = "%H:%M"
-            if ":" not in time or len(time.split(":")) != 2:
-                raise ValueError("Gecersiz saat formati! \nSaati HH:MM biciminde girin.")
-            # 10  30    seklinde int olarak bol ve zamana esitle
-            hour, minute = map(int, time.split(":"))
-            time = f"{hour:02d}:{minute:02d}"
-
-        except ValueError as e:
-            # raise'lanan hata gosterilir
-            messagebox.showerror("Hata", str(e))
-            return
 
         # Tarih eksik girilirse / hatali girilirse hata ver
         try:
@@ -387,6 +374,25 @@ class DentistAppointmentSystemUI:
                 "Hata",
                 "Gecmis bir saat icin randevu alinamaz! \nLutfen ileri bir tarih ve saat girin.",
                 )
+            return
+        
+        # Saat eksik girilirse / hatali girilirse hata ver
+        try:    # 10    :   30
+            time_format = "%H:%M"
+            if ":" not in time or len(time.split(":")) != 2:
+                raise ValueError("Gecersiz saat formati! \nSaati HH:MM biciminde girin.")
+            # 10  30    seklinde int olarak bol ve zamana esitle
+            hour, minute = map(int, time.split(":"))
+            
+            # sonu 00 | 10 | 20 | 30 | 40 | 50 | 60 olan dakikalara randevu alinabilecek 
+            if minute % 10 != 0:
+                raise ValueError("Dakika kismi 10'a tam bolunebilmeli.")
+            
+            time = f"{hour:02d}:{minute:02d}"
+            
+        except ValueError as e:
+            # raise'lanan hata gosterilir
+            messagebox.showerror("Hata", str(e))
             return
         
         # Gecmis bir tarihe randevu alinamaz
